@@ -6,6 +6,7 @@ export type BookFormValues = {
   author: string;
   isbn?: string;
   grade?: string;
+  subject?: string;
   totalCopies: number;
 };
 
@@ -41,6 +42,11 @@ export function BookForm({
           placeholder="Grade"
           value={values.grade || ""}
           onChange={(e) => onChange({ ...values, grade: e.target.value })}
+        />
+        <Input
+          placeholder="Subject (e.g., Biology, Physics)"
+          value={values.subject || ""}
+          onChange={(e) => onChange({ ...values, subject: e.target.value })}
         />
         <Input
           placeholder="Total Copies"

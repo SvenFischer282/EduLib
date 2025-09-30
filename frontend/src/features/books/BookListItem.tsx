@@ -7,6 +7,7 @@ export type BookItemProps = {
   author: string;
   isbn?: string;
   grade?: number | string;
+  subject?: string;
   availableCopies: number;
   totalCopies: number;
   canDelete?: boolean;
@@ -19,6 +20,7 @@ export function BookListItem({
   author,
   isbn,
   grade,
+  subject,
   availableCopies,
   totalCopies,
   canDelete,
@@ -46,8 +48,8 @@ export function BookListItem({
         <div>
           <div className="font-semibold">{title}</div>
           <div className="mt-0.5 text-xs text-gray-500">
-            {author} • ISBN {isbn || "—"} • Grade {grade} • Avail{" "}
-            {availableCopies}/{totalCopies}
+            {author} • ISBN {isbn || "—"} • Grade {grade} • {subject || "—"} •
+            Avail {availableCopies}/{totalCopies}
           </div>
         </div>
       </div>
