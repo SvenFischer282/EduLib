@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Select } from "./Select";
 
 export type Role = "Teacher" | "Librarian";
 
@@ -16,12 +17,12 @@ export function RoleSwitcher() {
   }, [role]);
 
   return (
-    <div className="role-switcher">
-      <label>Role</label>
-      <select value={role} onChange={(e) => setRole(e.target.value as Role)}>
+    <div className="flex items-center gap-2">
+      <label className="text-sm">Role</label>
+      <Select value={role} onChange={(e) => setRole(e.target.value as Role)}>
         <option value="Teacher">Teacher</option>
         <option value="Librarian">Librarian</option>
-      </select>
+      </Select>
     </div>
   );
 }

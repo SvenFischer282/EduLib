@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { api } from "../lib/api";
+import { BookForm, BookFormValues } from "../features/books/BookForm";
+import { BookListItem } from "../features/books/BookListItem";
+import { BookList } from "../features/books/BookList";
 
-type Book = {
+export type Book = {
   _id: string;
   title: string;
   author: string;
@@ -14,7 +17,7 @@ type Book = {
 export function BooksPage() {
   const [items, setItems] = useState<Book[]>([]);
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<BookFormValues>({
     title: "",
     author: "",
     isbn: "",
@@ -58,67 +61,30 @@ export function BooksPage() {
 
   return (
     <div>
-      <h1>Books</h1>
+      <h1 className="mb-4 text-2xl font-bold">Books</h1>
       {role === "Librarian" && (
-        <div className="card">
-          <h2>Add Book</h2>
-          <div className="grid">
-            <input
-              placeholder="Title"
-              value={form.title}
-              onChange={(e) => setForm({ ...form, title: e.target.value })}
-            />
-            <input
-              placeholder="Author"
-              value={form.author}
-              onChange={(e) => setForm({ ...form, author: e.target.value })}
-            />
-            <input
-              placeholder="ISBN"
-              value={form.isbn}
-              onChange={(e) => setForm({ ...form, isbn: e.target.value })}
-            />
-            <input
-              placeholder="Grade"
-              value={form.grade}
-              onChange={(e) => setForm({ ...form, grade: e.target.value })}
-            />
-            <input
-              placeholder="Total Copies"
-              type="number"
-              value={form.totalCopies}
-              onChange={(e) =>
-                setForm({ ...form, totalCopies: Number(e.target.value) })
-              }
-            />
-          </div>
-          <button className="btn" onClick={createBook}>
-            Create
-          </button>
-        </div>
+        <BookForm values={form} onChange={setForm} onSubmit={createBook} />
       )}
 
       {loading ? (
         <p>Loading...</p>
       ) : (
-        <div className="list">
+        <BookList>
           {items.map((b) => (
-            <div key={b._id} className="item">
-              <div>
-                <div className="title">{b.title}</div>
-                <div className="meta">
-                  {b.author} • ISBN {b.isbn || "—"} • Grade {b.grade} • Avail{" "}
-                  {b.availableCopies}/{b.totalCopies}
-                </div>
-              </div>
-              {role === "Librarian" && (
-                <button className="btn ghost" onClick={() => remove(b._id)}>
-                  Delete
-                </button>
-              )}
-            </div>
+            <BookListItem
+              key={b._id}
+              id={b._id}
+              title={b.title}
+              author={b.author}
+              isbn={b.isbn}
+              grade={b.grade}
+              availableCopies={b.availableCopies}
+              totalCopies={b.totalCopies}
+              canDelete={role === "Librarian"}
+              onDelete={remove}
+            />
           ))}
-        </div>
+        </BookList>
       )}
     </div>
   );

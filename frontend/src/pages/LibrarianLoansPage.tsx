@@ -1,14 +1,8 @@
 import { useEffect, useState } from "react";
 import { api } from "../lib/api";
-
-type LoanItem = { bookId: string; title: string; quantityBorrowed: number };
-type Loan = {
-  _id: string;
-  status: string;
-  dueDate: string;
-  loanItems: LoanItem[];
-  teacherName: string;
-};
+import { LoanList } from "../features/loans/LoanList";
+import { LoanListItem, Loan } from "../features/loans/LoanListItem";
+import { Button } from "../ui/Button";
 
 export function LibrarianLoansPage() {
   const [loans, setLoans] = useState<Loan[]>([]);
@@ -37,40 +31,33 @@ export function LibrarianLoansPage() {
 
   return (
     <div>
-      <h1>Librarian Loans</h1>
-      <div className="list">
+      <h1 className="mb-4 text-2xl font-bold">Librarian Loans</h1>
+      <LoanList>
         {loans.map((l) => (
-          <div key={l._id} className="item">
-            <div>
-              <div className="title">
-                {l.teacherName} • {l.loanItems[0]?.title} x{" "}
-                {l.loanItems[0]?.quantityBorrowed}
+          <LoanListItem
+            key={l._id}
+            loan={l}
+            showTeacher
+            actions={
+              <div className="flex items-center gap-2">
+                {l.status === "Requested" && (
+                  <>
+                    <Button onClick={() => approve(l._id)}>Approve</Button>
+                    <Button variant="ghost" onClick={() => reject(l._id)}>
+                      Reject
+                    </Button>
+                  </>
+                )}
+                {(l.status === "Active" || l.status === "Overdue") && (
+                  <Button onClick={() => markReturn(l._id)}>
+                    Mark Returned
+                  </Button>
+                )}
               </div>
-              <div className="meta">
-                Status: {l.status} • Due:{" "}
-                {new Date(l.dueDate).toLocaleDateString()}
-              </div>
-            </div>
-            <div className="actions">
-              {l.status === "Requested" && (
-                <>
-                  <button className="btn" onClick={() => approve(l._id)}>
-                    Approve
-                  </button>
-                  <button className="btn ghost" onClick={() => reject(l._id)}>
-                    Reject
-                  </button>
-                </>
-              )}
-              {(l.status === "Active" || l.status === "Overdue") && (
-                <button className="btn" onClick={() => markReturn(l._id)}>
-                  Mark Returned
-                </button>
-              )}
-            </div>
-          </div>
+            }
+          />
         ))}
-      </div>
+      </LoanList>
     </div>
   );
 }

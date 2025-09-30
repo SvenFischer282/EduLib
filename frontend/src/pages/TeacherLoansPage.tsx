@@ -1,8 +1,13 @@
 import { useEffect, useState } from "react";
 import { api } from "../lib/api";
+import { RequestForm, RequestFormValues } from "../features/loans/RequestForm";
+import { LoanList } from "../features/loans/LoanList";
+import { LoanListItem } from "../features/loans/LoanListItem";
 
 type Book = { _id: string; title: string };
+
 type LoanItem = { bookId: string; title: string; quantityBorrowed: number };
+
 type Loan = {
   _id: string;
   status: string;
@@ -13,9 +18,8 @@ type Loan = {
 export function TeacherLoansPage() {
   const [books, setBooks] = useState<Book[]>([]);
   const [loans, setLoans] = useState<Loan[]>([]);
-  const [form, setForm] = useState<LoanItem>({
+  const [form, setForm] = useState<RequestFormValues>({
     bookId: "",
-    title: "",
     quantityBorrowed: 1,
   });
 
@@ -32,67 +36,37 @@ export function TeacherLoansPage() {
     load();
   }, []);
 
-  function selectBook(id: string) {
-    const b = books.find((x) => x._id === id);
-    setForm({ ...form, bookId: id, title: b?.title || "" });
-  }
-
   async function submitRequest() {
+    const selected = books.find((x) => x._id === form.bookId);
+    const payload: LoanItem = {
+      bookId: form.bookId,
+      title: selected?.title || "",
+      quantityBorrowed: form.quantityBorrowed,
+    };
     await api.post("/loans", {
       dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-      loanItems: [form],
+      loanItems: [payload],
     });
-    setForm({ bookId: "", title: "", quantityBorrowed: 1 });
+    setForm({ bookId: "", quantityBorrowed: 1 });
     load();
   }
 
   return (
     <div>
-      <h1>Teacher Loans</h1>
-      <div className="card">
-        <h2>Request Class Loan</h2>
-        <div className="grid">
-          <select
-            value={form.bookId}
-            onChange={(e) => selectBook(e.target.value)}
-          >
-            <option value="">Select book…</option>
-            {books.map((b) => (
-              <option key={b._id} value={b._id}>
-                {b.title}
-              </option>
-            ))}
-          </select>
-          <input
-            type="number"
-            min={1}
-            value={form.quantityBorrowed}
-            onChange={(e) =>
-              setForm({ ...form, quantityBorrowed: Number(e.target.value) })
-            }
-          />
-        </div>
-        <button className="btn" disabled={!form.bookId} onClick={submitRequest}>
-          Submit Request
-        </button>
-      </div>
+      <h1 className="mb-4 text-2xl font-bold">Teacher Loans</h1>
+      <RequestForm
+        books={books}
+        values={form}
+        onChange={setForm}
+        onSubmit={submitRequest}
+      />
 
-      <h2>My Loans</h2>
-      <div className="list">
+      <h2 className="mt-6 text-lg font-semibold">My Loans</h2>
+      <LoanList>
         {loans.map((l) => (
-          <div key={l._id} className="item">
-            <div>
-              <div className="title">
-                {l.loanItems[0]?.title} x {l.loanItems[0]?.quantityBorrowed}
-              </div>
-              <div className="meta">
-                Status: {l.status} • Due:{" "}
-                {new Date(l.dueDate).toLocaleDateString()}
-              </div>
-            </div>
-          </div>
+          <LoanListItem key={l._id} loan={l} />
         ))}
-      </div>
+      </LoanList>
     </div>
   );
 }
