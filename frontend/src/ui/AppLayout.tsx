@@ -6,7 +6,7 @@ export function AppLayout() {
   return (
     <div>
       <header className="app-header">
-        <div className="brand">CLMS</div>
+        <div className="brand">EduLib</div>
         <nav className="nav">
           <Link className={loc.pathname === "/" ? "active" : ""} to="/">
             Books

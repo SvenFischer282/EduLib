@@ -6,7 +6,7 @@ type Book = {
   title: string;
   author: string;
   isbn?: string;
-  callNumber?: string;
+  grade?: number;
   totalCopies: number;
   availableCopies: number;
 };
@@ -18,7 +18,7 @@ export function BooksPage() {
     title: "",
     author: "",
     isbn: "",
-    callNumber: "",
+    grade: "",
     totalCopies: 10,
   });
   const role = (localStorage.getItem("role") || "Teacher") as
@@ -45,7 +45,7 @@ export function BooksPage() {
       title: "",
       author: "",
       isbn: "",
-      callNumber: "",
+      grade: "",
       totalCopies: 10,
     });
     load();
@@ -79,9 +79,9 @@ export function BooksPage() {
               onChange={(e) => setForm({ ...form, isbn: e.target.value })}
             />
             <input
-              placeholder="Call Number"
-              value={form.callNumber}
-              onChange={(e) => setForm({ ...form, callNumber: e.target.value })}
+              placeholder="Grade"
+              value={form.grade}
+              onChange={(e) => setForm({ ...form, grade: e.target.value })}
             />
             <input
               placeholder="Total Copies"
@@ -107,8 +107,8 @@ export function BooksPage() {
               <div>
                 <div className="title">{b.title}</div>
                 <div className="meta">
-                  {b.author} • ISBN {b.isbn || "—"} • Avail {b.availableCopies}/
-                  {b.totalCopies}
+                  {b.author} • ISBN {b.isbn || "—"} • Grade {b.grade} • Avail{" "}
+                  {b.availableCopies}/{b.totalCopies}
                 </div>
               </div>
               {role === "Librarian" && (
