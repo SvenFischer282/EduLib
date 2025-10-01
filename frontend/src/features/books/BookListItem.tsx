@@ -11,7 +11,9 @@ export type BookItemProps = {
   availableCopies: number;
   totalCopies: number;
   canDelete?: boolean;
+  canRequest?: boolean;
   onDelete?: (id: string) => void;
+  onRequest?: (id: string, title: string) => void;
 };
 
 export function BookListItem({
@@ -24,7 +26,9 @@ export function BookListItem({
   availableCopies,
   totalCopies,
   canDelete,
+  canRequest,
   onDelete,
+  onRequest,
 }: BookItemProps) {
   const coverUrl = `${BASE_URL}/books/${id}/cover`;
   const fallbackUrl =
@@ -53,11 +57,16 @@ export function BookListItem({
           </div>
         </div>
       </div>
-      {canDelete && onDelete && (
-        <Button variant="ghost" onClick={() => onDelete(id)}>
-          Delete
-        </Button>
-      )}
+      <div className="flex items-center gap-2">
+        {canRequest && onRequest && availableCopies > 0 && (
+          <Button onClick={() => onRequest(id, title)}>Request</Button>
+        )}
+        {canDelete && onDelete && (
+          <Button variant="ghost" onClick={() => onDelete(id)}>
+            Delete
+          </Button>
+        )}
+      </div>
     </div>
   );
 }
