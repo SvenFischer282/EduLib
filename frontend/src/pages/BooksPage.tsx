@@ -7,6 +7,7 @@ import { Input } from "../ui/Input";
 import { Select } from "../ui/Select";
 import { Button } from "../ui/Button";
 import { Modal } from "../ui/Modal";
+import { Spinner } from "../ui/Spinner";
 import { useDebounce } from "../ui/useDebounce";
 
 export type Book = {
@@ -198,7 +199,10 @@ export function BooksPage() {
       )}
 
       {loading ? (
-        <p>Loading...</p>
+        <div className="flex justify-center items-center py-8">
+          <Spinner />
+          <span className="ml-2 text-gray-600">Loading books...</span>
+        </div>
       ) : (
         <BookList>
           {filtered.map((b) => (

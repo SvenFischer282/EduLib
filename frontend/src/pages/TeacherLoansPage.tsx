@@ -5,6 +5,7 @@ import { LoanList } from "../features/loans/LoanList";
 import { LoanListItem } from "../features/loans/LoanListItem";
 import { Select } from "../ui/Select";
 import { Input } from "../ui/Input";
+import { Spinner } from "../ui/Spinner";
 import { useDebounce } from "../ui/useDebounce";
 
 type Book = { _id: string; title: string };
@@ -21,6 +22,7 @@ type Loan = {
 export function TeacherLoansPage() {
   const [books, setBooks] = useState<Book[]>([]);
   const [loans, setLoans] = useState<Loan[]>([]);
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState<RequestFormValues>({
     bookId: "",
     quantityBorrowed: 1,
@@ -30,12 +32,17 @@ export function TeacherLoansPage() {
   const debouncedQuery = useDebounce(query, 600);
 
   async function load() {
-    const [b, l] = await Promise.all([
-      api.get<Book[]>("/books"),
-      api.get<Loan[]>("/loans/my"),
-    ]);
-    setBooks(b.data);
-    setLoans(l.data);
+    setLoading(true);
+    try {
+      const [b, l] = await Promise.all([
+        api.get<Book[]>("/books"),
+        api.get<Loan[]>("/loans/my"),
+      ]);
+      setBooks(b.data);
+      setLoans(l.data);
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
@@ -93,11 +100,18 @@ export function TeacherLoansPage() {
       </div>
 
       <h2 className="mt-2 text-lg font-semibold">My Loans</h2>
-      <LoanList>
-        {filtered.map((l) => (
-          <LoanListItem key={l._id} loan={l} />
-        ))}
-      </LoanList>
+      {loading ? (
+        <div className="flex justify-center items-center py-8">
+          <Spinner />
+          <span className="ml-2 text-gray-600">Loading loans...</span>
+        </div>
+      ) : (
+        <LoanList>
+          {filtered.map((l) => (
+            <LoanListItem key={l._id} loan={l} />
+          ))}
+        </LoanList>
+      )}
     </div>
   );
 }

@@ -5,10 +5,12 @@ import { LoanListItem, Loan } from "../features/loans/LoanListItem";
 import { Button } from "../ui/Button";
 import { Select } from "../ui/Select";
 import { Input } from "../ui/Input";
+import { Spinner } from "../ui/Spinner";
 import { useDebounce } from "../ui/useDebounce";
 
 export function LibrarianLoansPage() {
   const [loans, setLoans] = useState<Loan[]>([]);
+  const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<string>("");
   const [teacher, setTeacher] = useState<string>("");
   const [query, setQuery] = useState("");
@@ -16,8 +18,13 @@ export function LibrarianLoansPage() {
   const debouncedQuery = useDebounce(query, 600);
 
   async function load() {
-    const res = await api.get<Loan[]>("/loans");
-    setLoans(res.data);
+    setLoading(true);
+    try {
+      const res = await api.get<Loan[]>("/loans");
+      setLoans(res.data);
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
@@ -73,32 +80,39 @@ export function LibrarianLoansPage() {
         />
       </div>
 
-      <LoanList>
-        {filtered.map((l) => (
-          <LoanListItem
-            key={l._id}
-            loan={l}
-            showTeacher
-            actions={
-              <div className="flex items-center gap-2">
-                {l.status === "Requested" && (
-                  <>
-                    <Button onClick={() => approve(l._id)}>Approve</Button>
-                    <Button variant="ghost" onClick={() => reject(l._id)}>
-                      Reject
+      {loading ? (
+        <div className="flex justify-center items-center py-8">
+          <Spinner />
+          <span className="ml-2 text-gray-600">Loading loans...</span>
+        </div>
+      ) : (
+        <LoanList>
+          {filtered.map((l) => (
+            <LoanListItem
+              key={l._id}
+              loan={l}
+              showTeacher
+              actions={
+                <div className="flex items-center gap-2">
+                  {l.status === "Requested" && (
+                    <>
+                      <Button onClick={() => approve(l._id)}>Approve</Button>
+                      <Button variant="ghost" onClick={() => reject(l._id)}>
+                        Reject
+                      </Button>
+                    </>
+                  )}
+                  {(l.status === "Active" || l.status === "Overdue") && (
+                    <Button onClick={() => markReturn(l._id)}>
+                      Mark Returned
                     </Button>
-                  </>
-                )}
-                {(l.status === "Active" || l.status === "Overdue") && (
-                  <Button onClick={() => markReturn(l._id)}>
-                    Mark Returned
-                  </Button>
-                )}
-              </div>
-            }
-          />
-        ))}
-      </LoanList>
+                  )}
+                </div>
+              }
+            />
+          ))}
+        </LoanList>
+      )}
     </div>
   );
 }
