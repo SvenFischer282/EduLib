@@ -56,9 +56,6 @@ const LoginPage = () => {
       setAuthToken(response.token);
       setCurrentUser(response.user);
 
-      // Store role for legacy compatibility
-      localStorage.setItem("role", response.user.role);
-
       // Redirect to books page
       window.location.replace("/books");
     } catch (error) {
@@ -78,7 +75,6 @@ const LoginPage = () => {
       const response = await authAPI.login(username, password);
       setAuthToken(response.token);
       setCurrentUser(response.user);
-      localStorage.setItem("role", response.user.role);
       window.location.replace("/books");
     } catch (error) {
       setError(error.response?.data?.message || "Login failed");
@@ -120,7 +116,7 @@ const LoginPage = () => {
               cursor: "pointer",
             }}
           >
-            Teacher 1 (Class 10A)
+            Teacher 1 (Class 1A)
           </button>
           <button
             onClick={() => quickLogin("librarian1", "password123")}
@@ -211,20 +207,40 @@ const LoginPage = () => {
                 <label style={{ display: "block", marginBottom: "0.5rem" }}>
                   Class Assignment:
                 </label>
-                <input
-                  type="text"
-                  name="classAssignment"
-                  value={formData.classAssignment}
-                  onChange={handleInputChange}
-                  placeholder="e.g., 10A"
-                  style={{
-                    width: "100%",
-                    padding: "0.5rem",
-                    border: "1px solid #ddd",
-                    borderRadius: "4px",
-                    boxSizing: "border-box",
-                  }}
-                />
+                <div style={{ display: "flex", gap: "0.5rem" }}>
+                  <select
+                    value={grade}
+                    onChange={(e) => setGrade(e.target.value)}
+                    style={{
+                      flex: 1,
+                      padding: "0.5rem",
+                      border: "1px solid #ddd",
+                      borderRadius: "4px",
+                    }}
+                  >
+                    {[...Array(4)].map((_, i) => (
+                      <option key={i + 1} value={i + 1}>
+                        {i + 1}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    value={classLetter}
+                    onChange={(e) => setClassLetter(e.target.value)}
+                    style={{
+                      flex: 1,
+                      padding: "0.5rem",
+                      border: "1px solid #ddd",
+                      borderRadius: "4px",
+                    }}
+                  >
+                    {["A", "B", "C", "D"].map((letter) => (
+                      <option key={letter} value={letter}>
+                        {letter}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             )}
           </>

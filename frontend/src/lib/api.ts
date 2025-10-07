@@ -33,15 +33,19 @@ export const isAuthenticated = (): boolean => {
   return !!(token && user);
 };
 
+// Get current user's role from authenticated user data
+export function getUserRole(): "Teacher" | "Librarian" | null {
+  const user = getCurrentUser();
+  return user?.role || null;
+}
+
 // Legacy function for backward compatibility
 export function getUserId(): string {
   const user = getCurrentUser();
   if (user?.id) return user.id;
 
   // Fallback to old logic for transition period
-  const role = (localStorage.getItem("role") || "Teacher") as
-    | "Teacher"
-    | "Librarian";
+  const role = getUserRole() || "Teacher";
   return role === "Teacher" ? "teacher123" : "librarian456";
 }
 

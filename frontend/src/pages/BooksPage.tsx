@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { api } from "../lib/api";
+import { api, getCurrentUser } from "../lib/api";
 import { BookForm, BookFormValues } from "../features/books/BookForm";
 import { BookListItem } from "../features/books/BookListItem";
 import { BookList } from "../features/books/BookList";
@@ -24,6 +24,7 @@ export type Book = {
 export function BooksPage() {
   const [items, setItems] = useState<Book[]>([]);
   const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   // Request modal state
   const [requestModal, setRequestModal] = useState<{
@@ -60,9 +61,9 @@ export function BooksPage() {
     subject: "",
     totalCopies: 10,
   });
-  const role = (localStorage.getItem("role") || "Teacher") as
-    | "Teacher"
-    | "Librarian";
+
+  const user = getCurrentUser();
+  const role = user?.role || "Teacher";
 
   async function load() {
     setLoading(true);
@@ -79,6 +80,7 @@ export function BooksPage() {
     await api.post("/books", {
       ...form,
       totalCopies: Number(form.totalCopies),
+      grade: form.grade ? Number(form.grade) : undefined,
     });
     setForm({
       title: "",
@@ -89,6 +91,8 @@ export function BooksPage() {
       totalCopies: 10,
     });
     load();
+    setSuccessMessage("Book created successfully!");
+    setTimeout(() => setSuccessMessage(""), 3000);
   }
 
   async function remove(id: string) {
@@ -195,7 +199,14 @@ export function BooksPage() {
       </div>
 
       {role === "Librarian" && (
-        <BookForm values={form} onChange={setForm} onSubmit={createBook} />
+        <>
+          {successMessage && (
+            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+              <span className="block sm:inline">{successMessage}</span>
+            </div>
+          )}
+          <BookForm values={form} onChange={setForm} onSubmit={createBook} />
+        </>
       )}
 
       {loading ? (

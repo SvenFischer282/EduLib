@@ -1,5 +1,4 @@
 import { Link, useLocation } from "react-router-dom";
-import { RoleSwitcher } from "./RoleSwitcher";
 import { getCurrentUser, removeAuthToken, isAuthenticated } from "../lib/api";
 
 export function Header() {
@@ -18,27 +17,33 @@ export function Header() {
     <header className="flex items-center justify-between bg-orange-500 px-5 py-3 text-white">
       <div className="text-lg font-bold">EduLib</div>
       <nav className="flex items-center gap-4">
-        <Link className={loc.pathname === "/" ? active : idle} to="/">
+        <Link className={loc.pathname === "/books" ? active : idle} to="/books">
           Books
         </Link>
-        <Link
-          className={loc.pathname.startsWith("/teacher") ? active : idle}
-          to="/teacher/loans"
-        >
-          Teacher Loans
-        </Link>
-        <Link
-          className={loc.pathname.startsWith("/librarian") ? active : idle}
-          to="/librarian/loans"
-        >
-          Librarian Loans
-        </Link>
+        {/* Show role-specific navigation based on authenticated user's role */}
+        {user?.role === "Teacher" && (
+          <Link
+            className={loc.pathname.startsWith("/teacher") ? active : idle}
+            to="/teacher/loans"
+          >
+            My Loans
+          </Link>
+        )}
+        {user?.role === "Librarian" && (
+          <Link
+            className={loc.pathname.startsWith("/librarian") ? active : idle}
+            to="/librarian/loans"
+          >
+            Manage Loans
+          </Link>
+        )}
       </nav>
       <div className="flex items-center gap-4">
         {authenticated && user && (
           <div className="flex items-center gap-3">
             <span className="text-sm">
               Welcome, {user.username} ({user.role})
+              {user.classAssignment && ` - ${user.classAssignment}`}
             </span>
             <button
               onClick={handleLogout}
@@ -48,7 +53,6 @@ export function Header() {
             </button>
           </div>
         )}
-        <RoleSwitcher />
       </div>
     </header>
   );
