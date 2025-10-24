@@ -2,9 +2,6 @@
 
 EduLib is a web-based application designed to streamline the management of a school's class library. It provides a simple and efficient way for teachers to request books for their classes and for librarians to manage the library's inventory and loan requests.
 
-## Live Demo
-
-[Link to live demo](https://edulib.example.com) (Note: This is a placeholder link.)
 
 ## Features
 
@@ -51,7 +48,7 @@ To get a local copy of the project up and running, follow these simple steps.
 1.  **Clone the repository:**
 
     ```sh
-    git clone https://github.com/your-username/edulib.git
+    git clone https://github.com//SvenFischer282/EduLib
     ```
 
 2.  **Install backend dependencies:**
