@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import {
   authAPI,
-  setAuthToken,
-  setCurrentUser,
   isAuthenticated,
 } from "../lib/api";
 
@@ -52,10 +50,7 @@ const LoginPage = () => {
         );
       }
 
-      // Store token and user data
-      setAuthToken(response.token);
-      setCurrentUser(response.user);
-
+      // The user is now set in the in-memory cache by authAPI.login/register
       // Redirect to books page
       window.location.replace("/books");
     } catch (error) {
@@ -72,9 +67,7 @@ const LoginPage = () => {
     setError("");
 
     try {
-      const response = await authAPI.login(username, password);
-      setAuthToken(response.token);
-      setCurrentUser(response.user);
+      await authAPI.login(username, password);
       window.location.replace("/books");
     } catch (error) {
       setError(error.response?.data?.message || "Login failed");

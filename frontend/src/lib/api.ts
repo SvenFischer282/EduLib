@@ -2,46 +2,33 @@ import axios from "axios";
 
 export const BASE_URL = "http://localhost:3000/api";
 
-// Auth token management
-export const getAuthToken = (): string | null => {
-  return localStorage.getItem("authToken");
-};
-
-export const setAuthToken = (token: string): void => {
-  localStorage.setItem("authToken", token);
-};
-
-export const removeAuthToken = (): void => {
-  localStorage.removeItem("authToken");
-  localStorage.removeItem("user");
-};
+let user: any = null;
 
 // User management
 export const getCurrentUser = () => {
-  const userStr = localStorage.getItem("user");
-  return userStr ? JSON.parse(userStr) : null;
+  return user;
 };
 
-export const setCurrentUser = (user: any): void => {
-  localStorage.setItem("user", JSON.stringify(user));
+export const setCurrentUser = (newUser: any): void => {
+  user = newUser;
+};
+
+export const removeCurrentUser = (): void => {
+  user = null;
 };
 
 // Check if user is authenticated
 export const isAuthenticated = (): boolean => {
-  const token = getAuthToken();
-  const user = getCurrentUser();
-  return !!(token && user);
+  return !!user;
 };
 
 // Get current user's role from authenticated user data
 export function getUserRole(): "Teacher" | "Librarian" | null {
-  const user = getCurrentUser();
   return user?.role || null;
 }
 
 // Legacy function for backward compatibility
 export function getUserId(): string {
-  const user = getCurrentUser();
   if (user?.id) return user.id;
 
   // Fallback to old logic for transition period
@@ -49,20 +36,9 @@ export function getUserId(): string {
   return role === "Teacher" ? "teacher123" : "librarian456";
 }
 
-export const api = axios.create({ baseURL: BASE_URL });
-
-// Request interceptor to add auth token
-api.interceptors.request.use((config) => {
-  config.headers = config.headers || {};
-
-  const token = getAuthToken();
-  if (token) {
-    config.headers["Authorization"] = `Bearer ${token}`;
-  }
-
-  // Keep legacy header for backward compatibility during transition
-  config.headers["X-User-ID"] = getUserId();
-  return config;
+export const api = axios.create({
+  baseURL: BASE_URL,
+  withCredentials: true,
 });
 
 // Response interceptor to handle auth errors
@@ -70,8 +46,8 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token is invalid or expired
-      removeAuthToken();
+      // User is not authenticated
+      removeCurrentUser();
       // Redirect to login if not already there
       if (window.location.pathname !== "/login") {
         window.location.replace("/login");
@@ -85,6 +61,7 @@ api.interceptors.response.use(
 export const authAPI = {
   login: async (username: string, password: string) => {
     const response = await api.post("/auth/login", { username, password });
+    setCurrentUser(response.data.user);
     return response.data;
   },
 
@@ -100,11 +77,25 @@ export const authAPI = {
       role,
       classAssignment,
     });
+    setCurrentUser(response.data.user);
     return response.data;
   },
 
+  logout: async () => {
+    // await api.post("/auth/logout"); // Uncomment when logout endpoint is implemented
+    removeCurrentUser();
+  },
+
   getCurrentUser: async () => {
-    const response = await api.get("/auth/me");
-    return response.data;
+    if (user) {
+      return user;
+    }
+    try {
+      const response = await api.get("/auth/me");
+      setCurrentUser(response.data.user);
+      return response.data.user;
+    } catch (error) {
+      return null;
+    }
   },
 };

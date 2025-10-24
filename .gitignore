@@ -1,0 +1,56 @@
+# Node modules
+node_modules/
+
+# Build outputs
+build/
+dist/
+coverage/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor directories and files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Cache
+.cache/
+.next/
+out/
+.tmp/
+temp/
+
+# Testing
+jest-html-reporters-*.html
+coverage/
+
+# Optional: React Native or Electron junk (safe to ignore if not used)
+.expo/
+electron-builder-output/
+
+# Optional: Package lock files (if using one package manager)
+# Uncomment one if needed
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+description.md
+TODO.md

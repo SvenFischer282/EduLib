@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Route,
@@ -12,9 +12,24 @@ import BooksPage from "./pages/BooksPage";
 import LoansPage from "./pages/LoansPage";
 import TeacherLoansPage from "./pages/TeacherLoansPage";
 import LibrarianLoansPage from "./pages/LibrarianLoansPage";
-import { isAuthenticated } from "./lib/api";
+import { authAPI, isAuthenticated } from "./lib/api";
+import Spinner from "./ui/Spinner";
 
 function App() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkUser = async () => {
+      await authAPI.getCurrentUser();
+      setLoading(false);
+    };
+    checkUser();
+  }, []);
+
+  if (loading) {
+    return <Spinner />;
+  }
+
   return (
     <Router>
       <Routes>
